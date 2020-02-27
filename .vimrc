@@ -59,6 +59,9 @@ let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
 Plug 'will133/vim-dirdiff'
 
+" Nice statusline/tabline
+Plug 'itchyny/lightline.vim'
+
 
 " Initialize plugin system
 call plug#end()
@@ -120,3 +123,10 @@ augroup END
 " *** "
 autocmd BufRead,BufNewFile *.launch setfiletype roslaunch
 
+
+"" *********** "
+"" STATUS-LINE "
+"" *********** "
+let g:lightline = {
+      \ 'colorscheme': 'wombat',
+            \ }
