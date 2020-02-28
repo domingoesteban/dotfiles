@@ -62,6 +62,23 @@ Plug 'will133/vim-dirdiff'
 " Nice statusline/tabline
 Plug 'itchyny/lightline.vim'
 
+" Code searching
+Plug 'mileszs/ack.vim'
+" Use ag instead of ack. Requires installing silversearcher-ag
+let g:ackprg = 'ag --nogroup --nocolor --column'
+" Report every match on the line:
+"let g:ackprg = 'ag --vimgrep'
+
+" Commenter
+Plug 'preservim/nerdcommenter'
+" Comment <leader>cc --> \cc
+" Uncomment <leader>cu
+" Toggle comment <leader>c<space>
+
+"
+"Plugin 'frazrepo/vim-rainbow'
+let g:rainbow_active = 1
+
 
 " Initialize plugin system
 call plug#end()
@@ -109,13 +126,12 @@ set mouse=a
 set spellfile=~/.vim/spell/en.utf-8.add
 
 
-" ****************** "
-" Auto-reload .vimrc "
-" ****************** "
-augroup myvimrchooks
-    au!
-    autocmd bufwritepost .vimrc source ~/.vimrc
-augroup END
+" *********** "
+" STATUS-LINE "
+" *********** "
+let g:lightline = {
+      \ 'colorscheme': 'wombat',
+            \ }
 
 
 " *** "
@@ -124,9 +140,10 @@ augroup END
 autocmd BufRead,BufNewFile *.launch setfiletype roslaunch
 
 
-"" *********** "
-"" STATUS-LINE "
-"" *********** "
-let g:lightline = {
-      \ 'colorscheme': 'wombat',
-            \ }
+" ****************** "
+" Auto-reload .vimrc "
+" ****************** "
+augroup myvimrchooks
+    au!
+    autocmd bufwritepost .vimrc source ~/.vimrc
+augroup END
