@@ -14,37 +14,6 @@ set foldmethod=indent
 set foldlevel=99
 
 
-" ******** "
-" COMMANDS "
-" ******** "
-" https://stackoverflow.com/questions/3776117/what-is-the-difference-between-the-remap-noremap-nnoremap-and-vnoremap-mapping
-" map, noremap: recursive and non-recursive all modes
-" nmap, nnoremap: only normal mode
-" vmap, vnoremap: only visual mode
-
-" plugins
-map <C-n> :NERDTreeToggle<CR>|  " Open/close NERDTree
-map <lead>lt :VimtexTocOpen<CR>|  " Open/close vimtex TOC
-"split navigations
-nnoremap <C-J> <C-W><C-J>
-nnoremap <C-K> <C-W><C-K>
-nnoremap <C-L> <C-W><C-L>
-nnoremap <C-H> <C-W><C-H>
-"tabs
-nnoremap tn :tabnew<Space>
-nnoremap tk :tabnext<CR>
-nnoremap tj :tabprev<CR>
-nnoremap th :tabfirst<CR>
-nnoremap tl :tablast<CR>
-nnoremap tc :tabclose<CR>
-nnoremap ts :tab<Space>split<CR>
-" Enable folding with the spacebar
-nnoremap <space> za
-"normal mode
-"nnoremap <NUL> i<CR><ESC>|  " NUL character is called with C-Space
-nnoremap <NUL> R<CR><ESC>|  " NUL character is called with C-Space
-
-
 " ************************ "
 " Plugin manager: VIM-PLUG
 " ************************ "
@@ -57,7 +26,7 @@ call plug#begin('~/.vim/plugged')
 " ---------------
 
 Plug 'scrooloose/nerdtree'
-let NERDTreeIgnore=['\.pyc$', '\~$'] "ignore files in NERDTree
+let NERDTreeIgnore=['\.pyc$', '\~$', '__pycache__'] "ignore files in NERDTree
 
 " VIM+Latex
 Plug 'lervag/vimtex'
@@ -82,10 +51,23 @@ endfunction
 Plug 'Valloric/YouCompleteMe', { 'do': function('BuildYCM') }
 " Use clangd vs libclang
 let g:ycm_use_clangd=1
+let g:ycm_autoclose_preview_window_after_completion=1
 
-"Plug 'SirVer/ultisnips'
-"" Snippets are separated from the engine. Add this if you want them:
-"" Plugin 'honza/vim-snippets'
+
+" Syntax checking/highlighting
+" Check syntax on each save
+Plug 'vim-syntastic/syntastic'
+" Python PEP8 checking. Use <F7> (now <leader>f) to run flake8 on file
+" For removing all markers: call flake8#Flake8UnplaceMarkers()
+Plug 'nvie/vim-flake8'
+let g:flake8_show_in_gutter=1 " show signs in the gutter
+let g:flake8_show_in_file=1  " show marks in the file
+let g:flake8_show_quickfix=1  " show (default)
+
+
+" Snippets
+Plug 'SirVer/ultisnips'
+"Plug 'honza/vim-snippets'
 "" Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
 "let g:UltiSnipsExpandTrigger="<tab>"
 "let g:UltiSnipsJumpForwardTrigger="<c-b>"
@@ -93,9 +75,15 @@ let g:ycm_use_clangd=1
 "" If you want :UltiSnipsEdit to split your window.
 "" let g:UltiSnipsEditSplit="vertical"
 
+" Create tags
 "Plug 'ludovicchabant/vim-gutentags'
 
+" VIM-diff
 Plug 'will133/vim-dirdiff'
+
+" Maximizes and restore window
+Plug 'szw/vim-maximizer'
+let g:maximizer_set_default_mapping=0
 
 " Nice statusline/tabline
 Plug 'itchyny/lightline.vim'
@@ -116,10 +104,10 @@ endif
 Plug 'kien/ctrlp.vim'
 
 " Commenter
-Plug 'preservim/nerdcommenter'
 " Comment <leader>cc --> \cc
 " Uncomment <leader>cu
 " Toggle comment <leader>c<space>
+Plug 'preservim/nerdcommenter'
 
 " Decorator for parenthesis
 Plug 'frazrepo/vim-rainbow'
@@ -137,6 +125,19 @@ Plug 'tpope/vim-fugitive'
 
 " Anaconda support
 Plug 'cjrh/vim-conda'
+" Supress anoying message on vim startup
+let g:conda_startup_msg_suppress = 1
+
+" Debugger client
+" Check shortcuts in github
+" <F10>toggle breakpoint.
+"Plug 'vim-vdebug/vdebug'
+
+Plug 'Shougo/vimproc.vim', {'do' : 'make'}
+"For more info: help vebugger-launching
+"For more info: help vebugger-usage
+Plug 'idanarye/vim-vebugger'
+let g:vebugger_leader='<leader>d'
 
 " Initialize plugin system
 call plug#end()
@@ -146,6 +147,7 @@ call plug#end()
 " THEME "
 " ***** "
 syntax enable
+syntax on  " TODO: Check if it's the same than previous one
 
 set t_Co=256   " This is may or may not needed.
 if exists('+termguicolors')
@@ -187,6 +189,8 @@ set shiftwidth=2
 " a combination of spaces and tabs are used to simulate tab stops at a width
 " other than the (hard)tabstop
 "set softtabstop=4
+" Make TAB compatible with youcompleteme
+set nosmarttab
 
 " Line Numbering
 "set nu
@@ -201,11 +205,63 @@ set mouse=a
 " Spelling file
 set spellfile=~/.vim/spell/en.utf-8.add
 
+" Languages syntax
+let python_highlight_all=1
 
-" *** "
-" ROS "
-" *** "
-autocmd BufRead,BufNewFile *.launch setfiletype roslaunch
+
+" *************************** "
+" Treatment to file extension "
+" *************************** "
+autocmd bufread,bufnewfile *.launch setfiletype roslaunch  " ros-file
+autocmd bufread,bufnewfile *.py setlocal colorcolumn=120  " ros-file
+
+
+" ******** "
+" COMMANDS "
+" ******** "
+" https://stackoverflow.com/questions/3776117/what-is-the-difference-between-the-remap-noremap-nnoremap-and-vnoremap-mapping
+" map, noremap: recursive and non-recursive all modes
+" nmap, nnoremap: only normal mode
+" vmap, vnoremap: only visual mode
+
+" plugins
+" -------
+map <C-n> :NERDTreeToggle<CR>|  " Open/close NERDTree
+map <leader>n :NERDTreeFind<cr>  " View current buffer in NERDTree
+map <leader>lt :VimtexTocOpen<CR>|  " Open/close vimtex TOC
+map <leader>co :CondaChangeEnv<CR>
+map <leader>g  :YcmCompleter GoToDefinitionElseDeclaration<CR>
+map <buffer> <leader>fl :call Flake8()<CR>
+noremap <leader>dk :VBGkill<CR>
+noremap <leader>dp :VBGstartPDB3 %<CR>
+nnoremap <leader>sm :MaximizerToggle<CR>
+
+"split navigations
+nnoremap <C-J> <C-W><C-J>
+nnoremap <C-K> <C-W><C-K>
+nnoremap <C-L> <C-W><C-L>
+nnoremap <C-H> <C-W><C-H>
+"tabs
+nnoremap tn :tabnew<Space>
+nnoremap tk :tabnext<CR>
+nnoremap tj :tabprev<CR>
+nnoremap th :tabfirst<CR>
+nnoremap tl :tablast<CR>
+nnoremap tc :tabclose<CR>
+nnoremap ts :tab<Space>split<CR>
+" Enable folding with the spacebar
+nnoremap <space> za
+" Search/Replacement
+nnoremap <leader>re :%s/\<<C-r><C-w>\>//gc<Left><Left><Left>
+vnoremap <leader>re "hy:%s/<C-r>h//gc<left><left><left>
+
+"normal mode
+"nnoremap <NUL> i<CR><ESC>|  " NUL character is called with C-Space
+nnoremap <NUL> R<CR><ESC>|  " NUL character is called with C-Space
+" python
+nnoremap <leader>pp :exec '!clear; python' shellescape(@%, 1)<CR>
+nnoremap <leader>pu :exec '!clear; python -m pudb' shellescape(@%, 1)<CR>
+nnoremap <leader>pd :exec '!clear; python -m pdb' shellescape(@%, 1)<CR>
 
 
 " ****************** "
@@ -215,3 +271,7 @@ augroup myvimrchooks
     au!
     autocmd bufwritepost .vimrc source ~/.vimrc
 augroup END
+
+
+"" Run flake8 when run a python file
+"autocmd BufWritePost *.py call flake8#Flake8()
